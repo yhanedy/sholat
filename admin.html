@@ -20,10 +20,10 @@
 
   <!-- Dashboard Admin -->
   <div id="dashboard-box" class="max-w-4xl mx-auto hidden space-y-6">
-    <div class="flex justify-between items-center border-b border-zinc-800 pb-4">
+    <div class="flex flex-wrap justify-between items-center gap-3 border-b border-zinc-800 pb-4">
       <div>
-        <h1 class="text-xl font-bold text-[#D4AF37]">Dashboard Santri Sabilil Muttaqin</h1>
-        <p class="text-xs text-zinc-400">SMAN 2 Karanganyar • Kelola Hadits Motivasi & Doa</p>
+        <h1 class="text-lg sm:text-xl font-bold text-[#D4AF37]">Dashboard Santri Sabilil Muttaqin</h1>
+        <p class="text-xs text-zinc-400">SMAN 2 Karanganyar • Kelola Doa Sekolah & Password</p>
       </div>
       <div class="flex gap-2">
         <a href="/" class="px-3 py-1.5 rounded-lg bg-zinc-800 text-xs hover:bg-zinc-700">Lihat Web ↗</a>
@@ -32,25 +32,13 @@
     </div>
 
     <!-- Tab Navigasi -->
-    <div class="flex flex-wrap gap-2 border-b border-zinc-800 pb-3">
-      <button onclick="switchTab('motivasi')" id="tab-motivasi" class="px-4 py-2 rounded-lg bg-[#D4AF37] text-black text-xs font-bold">Motivasi / Hadits</button>
-      <button onclick="switchTab('doa')" id="tab-doa" class="px-4 py-2 rounded-lg bg-zinc-900 text-zinc-300 text-xs font-semibold">Doa Sekolah</button>
+    <div class="flex gap-2 border-b border-zinc-800 pb-3">
+      <button onclick="switchTab('doa')" id="tab-doa" class="px-4 py-2 rounded-lg bg-[#D4AF37] text-black text-xs font-bold">Doa Sekolah</button>
       <button onclick="switchTab('password')" id="tab-password" class="px-4 py-2 rounded-lg bg-zinc-900 text-zinc-300 text-xs font-semibold">Ganti Password</button>
     </div>
 
-    <!-- Section Motivasi -->
-    <div id="sec-motivasi" class="grid md:grid-cols-2 gap-6">
-      <form onsubmit="submitData(event, 'motivasi')" class="p-5 rounded-2xl bg-[#141414] border border-zinc-800 space-y-3 h-fit">
-        <h2 class="text-sm font-bold text-[#D4AF37]">+ Tambah Hadits / Motivasi</h2>
-        <textarea name="teks" required rows="3" placeholder="Isi kutipan hadits atau motivasi..." class="w-full p-2.5 rounded-lg bg-[#1C1C1C] border border-zinc-700 text-xs"></textarea>
-        <input name="sumber" required placeholder="Sumber (cth: HR. Bukhari / Pengingat Rohis)" class="w-full p-2.5 rounded-lg bg-[#1C1C1C] border border-zinc-700 text-xs" />
-        <button type="submit" class="w-full py-2.5 rounded-lg bg-[#D4AF37] text-black font-bold text-xs">Simpan Motivasi</button>
-      </form>
-      <div id="list-motivasi" class="space-y-2"></div>
-    </div>
-
     <!-- Section Doa -->
-    <div id="sec-doa" class="grid md:grid-cols-2 gap-6 hidden">
+    <div id="sec-doa" class="grid md:grid-cols-2 gap-6">
       <form onsubmit="submitData(event, 'doa')" class="p-5 rounded-2xl bg-[#141414] border border-zinc-800 space-y-3 h-fit">
         <h2 class="text-sm font-bold text-[#D4AF37]">+ Tambah Doa Pelajar</h2>
         <input name="judul" required placeholder="Judul Doa (cth: Doa Sebelum Ujian)" class="w-full p-2.5 rounded-lg bg-[#1C1C1C] border border-zinc-700 text-xs" />
@@ -105,7 +93,7 @@
     }
 
     function switchTab(tab) {
-      ["motivasi", "doa", "password"].forEach(t => {
+      ["doa", "password"].forEach(t => {
         document.getElementById("sec-" + t).classList.toggle("hidden", t !== tab);
         const btn = document.getElementById("tab-" + t);
         btn.className = t === tab 
@@ -118,17 +106,11 @@
       const res = await fetch(API_URL);
       const data = await res.json();
 
-      document.getElementById("list-motivasi").innerHTML = (data.motivasi || []).map(m => `
-        <div class="p-3.5 rounded-xl bg-[#141414] border border-zinc-800 flex justify-between items-start gap-2">
-          <div><p class="text-xs">"${m.teks}"</p><p class="text-[11px] text-[#D4AF37] mt-1">— ${m.sumber}</p></div>
-          <button onclick="deleteItem('motivasi', ${m.id})" class="text-xs text-red-400 hover:underline">Hapus</button>
-        </div>`).join("");
-
       document.getElementById("list-doa").innerHTML = (data.doa || []).map(d => `
         <div class="p-3.5 rounded-xl bg-[#141414] border border-zinc-800 flex justify-between items-start gap-2">
           <div><p class="text-xs font-bold text-[#D4AF37]">${d.judul}</p><p class="text-[11px] text-zinc-400 mt-1">${d.arti}</p></div>
-          <button onclick="deleteItem('doa', ${d.id})" class="text-xs text-red-400 hover:underline">Hapus</button>
-        </div>`).join("");
+          <button onclick="deleteItem('doa', ${d.id})" class="text-xs text-red-400 hover:underline shrink-0">Hapus</button>
+        </div>`).join("") || '<p class="text-xs text-zinc-500">Belum ada doa tersimpan.</p>';
     }
 
     async function submitData(e, table) {
