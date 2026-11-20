@@ -1,0 +1,38 @@
+(function renderBottomNav() {
+  const menu = [
+    { id: 'presensi',      label: 'Presensi', icon: 'fa-fingerprint', href: 'https://yhanedy.github.io/presensi-smandakra/siswa.html' },
+    { id: 'perpustakaan',  label: 'Mandala',  icon: 'fa-book-open',   href: 'https://yhanedy.github.io/perpus-smanda/' },
+    { id: 'salat',         label: 'Sholat',   icon: 'fa-mosque',      href: 'https://yhanedy.github.io/sholat/' }
+  ];
+
+  let activeId = 'presensi';
+  const url = window.location.href;
+
+  if (url.includes('perpus-smanda')) {
+    activeId = 'perpustakaan';
+  } else if (url.includes('sholat')) {
+    activeId = 'salat';
+  } else if (url.includes('presensi-smandakra') || url.includes('siswa.html')) {
+    activeId = 'presensi';
+  }
+
+  const nav = document.createElement('nav');
+  nav.className = 'bottom-nav md:hidden';
+  nav.setAttribute('aria-label', 'Navigasi utama');
+
+  nav.innerHTML = menu.map(m => `
+    <a href="${m.href}"
+       class="nav-item ${m.id === activeId ? 'active' : ''}"
+       data-page="${m.id}">
+      <i class="fa-solid ${m.icon}"></i>
+      <span>${m.label}</span>
+    </a>
+  `).join('');
+
+  const root = document.getElementById('bottom-nav-root');
+  if (root) {
+    root.replaceWith(nav);
+  } else {
+    document.body.appendChild(nav);
+  }
+})();
