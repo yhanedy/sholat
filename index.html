@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Santri Sabilil Muttaqin SMAN 2 Karanganyar - Jadwal Sholat & Teman Belajar</title>
+  <title>Santri Sabilil Muttaqin - SMAN 2 Karanganyar</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
@@ -16,7 +16,7 @@
   <header class="border-b border-zinc-800 bg-[#111111]/90 backdrop-blur-md sticky top-0 z-10">
     <div class="max-w-3xl mx-auto px-4 py-4 flex justify-between items-center">
       <div>
-        <h1 class="text-lg font-bold tracking-wide text-[#D4AF37]">Santri<span class="text-white font-light">Sabilil Muttaqin</span></h1>
+        <h1 class="text-lg font-bold tracking-wide text-[#D4AF37]">SANTRI <span class="text-white font-light">SABILIL MUTTAQIN</span></h1>
         <p id="lokasi-text" class="text-xs text-zinc-400">SMAN 2 Karanganyar • Mendeteksi lokasi...</p>
       </div>
       <a href="/admin.html" class="text-xs px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-[#D4AF37] transition">Admin Rohis</a>
@@ -24,7 +24,18 @@
   </header>
 
   <main class="max-w-3xl mx-auto px-4 mt-6 space-y-6">
-    <!-- Jadwal Sholat -->
+
+    <!-- 1. Daily Hadits & Motivasi (Di Atas Times Prayer) -->
+    <section class="p-5 rounded-2xl bg-[#141414] border border-[#D4AF37]/30 relative overflow-hidden">
+      <div class="flex justify-between items-center mb-2">
+        <span class="text-[11px] uppercase tracking-widest text-[#D4AF37] font-semibold">Daily Hadits & Motivasi</span>
+        <button onclick="nextMotivasi()" class="text-xs text-zinc-400 hover:text-white">Ganti Kutipan ↻</button>
+      </div>
+      <p id="motivasi-teks" class="text-sm text-zinc-200 italic leading-relaxed">"Memuat kutipan..."</p>
+      <p id="motivasi-sumber" class="text-xs text-[#D4AF37] mt-2 font-semibold"></p>
+    </section>
+
+    <!-- 2. Jadwal Sholat (Times Prayer) -->
     <section class="p-6 rounded-2xl bg-gradient-to-br from-[#161616] to-[#0F0F0F] border border-zinc-800 shadow-xl">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-xs uppercase tracking-widest text-zinc-400 font-semibold">Jadwal Sholat Hari Ini</h2>
@@ -35,59 +46,201 @@
       </div>
     </section>
 
-    <!-- Kata Motivasi / Hadits Pelajar -->
-    <section class="p-5 rounded-2xl bg-[#141414] border border-[#D4AF37]/30 relative overflow-hidden">
-      <div class="flex justify-between items-center mb-2">
-        <span class="text-[11px] uppercase tracking-widest text-[#D4AF37] font-semibold">Daily Hadits & Motivasi</span>
-        <button onclick="nextMotivasi()" class="text-xs text-zinc-400 hover:text-white">Ganti Kutipan ↻</button>
-      </div>
-      <p id="motivasi-teks" class="text-sm text-zinc-200 italic leading-relaxed">"Memuat kutipan..."</p>
-      <p id="motivasi-sumber" class="text-xs text-[#D4AF37] mt-2 font-semibold"></p>
-    </section>
-
-    <!-- Pomodoro & Doa -->
+    <!-- 3. Kalender Masehi & Hijriah (Hitung Mundur Puasa) + Asmaul Husna -->
     <div class="grid md:grid-cols-2 gap-6">
-      <!-- Pomodoro -->
-      <section class="p-6 rounded-2xl bg-[#141414] border border-zinc-800 flex flex-col justify-between">
+      <!-- Kalender & Hitung Mundur Puasa Sunnah -->
+      <section class="p-6 rounded-2xl bg-[#141414] border border-zinc-800 flex flex-col justify-between space-y-4">
         <div>
-          <h2 class="text-xs uppercase tracking-widest text-zinc-400 font-semibold mb-1">Fokus Belajar (Pomodoro)</h2>
-          <p class="text-xs text-zinc-500">25 menit belajar, berhenti saat adzan.</p>
+          <div class="flex justify-between items-center mb-3">
+            <h2 class="text-xs uppercase tracking-widest text-zinc-400 font-semibold">Kalender & Puasa Sunnah</h2>
+            <span class="text-[11px] px-2 py-0.5 rounded bg-[#D4AF37]/10 text-[#D4AF37]">Hijriah</span>
+          </div>
+          
+          <div class="p-4 rounded-xl bg-[#1B1B1B] border border-zinc-800/80">
+            <p id="tanggal-hijriah" class="text-lg font-bold text-[#D4AF37]">Memuat Hijriah...</p>
+            <p id="tanggal-masehi" class="text-xs text-zinc-400 mt-0.5">Memuat Masehi...</p>
+          </div>
         </div>
-        <div class="text-center my-6">
-          <div id="timer-display" class="text-5xl font-mono font-bold text-white">25:00</div>
-        </div>
-        <div class="flex gap-3">
-          <button id="btn-start" onclick="toggleTimer()" class="flex-1 py-2.5 rounded-xl bg-[#D4AF37] text-black font-semibold text-sm hover:bg-[#c29f2f] transition">Mulai Fokus</button>
-          <button onclick="resetTimer()" class="px-4 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 text-sm hover:bg-zinc-700 transition">Reset</button>
+
+        <!-- Hitung Mundur Puasa Sunnah Terdekat -->
+        <div id="countdown-puasa-box" class="space-y-2">
+          <p class="text-xs text-zinc-500">Menghitung jadwal puasa terdekat...</p>
         </div>
       </section>
 
-      <!-- Doa Pelajar (Dari Database) -->
-      <section class="p-6 rounded-2xl bg-[#141414] border border-zinc-800 space-y-3 max-h-96 overflow-y-auto">
-        <h2 class="text-xs uppercase tracking-widest text-zinc-400 font-semibold">Doa Pelajar & Ujian</h2>
-        <div id="doa-container" class="space-y-3">
-          <p class="text-xs text-zinc-500">Memuat doa...</p>
+      <!-- Asmaul Husna Acak (MyQuran API) -->
+      <section class="p-6 rounded-2xl bg-[#141414] border border-zinc-800 flex flex-col justify-between">
+        <div class="flex justify-between items-center mb-3">
+          <h2 class="text-xs uppercase tracking-widest text-zinc-400 font-semibold">Asmaul Husna</h2>
+          <button onclick="loadAsmaulHusna()" class="text-xs text-[#D4AF37] hover:underline">Acak ↻</button>
+        </div>
+        <div id="husna-container" class="p-4 rounded-xl bg-[#1B1B1B] border border-zinc-800/80 text-center my-auto space-y-2">
+          <p class="text-xs text-zinc-500 animate-pulse">Memuat Asmaul Husna...</p>
         </div>
       </section>
     </div>
 
-    <!-- Info Kajian (Dari Database) -->
-    <section class="p-6 rounded-2xl bg-[#141414] border border-zinc-800">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xs uppercase tracking-widest text-zinc-400 font-semibold">Info Kajian & Rohis</h2>
-        <span class="text-xs text-zinc-500">SMAN 2 Karanganyar</span>
+    <!-- 4. Doa Harian (Tab: Doa Acak MyQuran & Doa Sekolah Rohis) -->
+    <section class="p-6 rounded-2xl bg-[#141414] border border-zinc-800 space-y-4">
+      <div class="flex flex-wrap justify-between items-center gap-2">
+        <h2 class="text-xs uppercase tracking-widest text-zinc-400 font-semibold">Doa Harian & Pelajar</h2>
+        <div class="flex gap-1.5">
+          <button onclick="switchDoaTab('acak')" id="btn-doa-acak" class="px-3 py-1 rounded-lg bg-[#D4AF37] text-black text-xs font-bold">Doa Harian (Acak)</button>
+          <button onclick="switchDoaTab('rohis')" id="btn-doa-rohis" class="px-3 py-1 rounded-lg bg-zinc-800 text-zinc-300 text-xs font-semibold">Doa Sekolah</button>
+        </div>
       </div>
-      <div id="kajian-container" class="space-y-3">
-        <p class="text-xs text-zinc-500">Memuat info kajian...</p>
+
+      <!-- Konten Doa Acak MyQuran -->
+      <div id="panel-doa-acak" class="space-y-3">
+        <div id="doa-acak-box" class="p-4 rounded-xl bg-[#1B1B1B] border border-zinc-800/80">
+          <p class="text-xs text-zinc-500 animate-pulse">Memuat doa harian...</p>
+        </div>
+        <div class="text-right">
+          <button onclick="loadDoaAcak()" class="text-xs text-[#D4AF37] hover:underline">Tampilkan Doa Lainnya ↻</button>
+        </div>
+      </div>
+
+      <!-- Konten Doa Rohis (Database) -->
+      <div id="panel-doa-rohis" class="hidden space-y-3 max-h-80 overflow-y-auto">
+        <div id="doa-rohis-box" class="space-y-3">
+          <p class="text-xs text-zinc-500">Memuat doa sekolah...</p>
+        </div>
       </div>
     </section>
+
+    <!-- 5. Al-Qur'an Per Tema (MyQuran API) -->
+    <section class="p-6 rounded-2xl bg-[#141414] border border-zinc-800 space-y-4">
+      <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+        <h2 class="text-xs uppercase tracking-widest text-zinc-400 font-semibold">Al-Qur'an Per Tema</h2>
+        <select id="tema-select" onchange="loadQuranTema(this.value)" class="p-2 rounded-lg bg-[#1C1C1C] border border-zinc-700 text-xs text-zinc-200 focus:outline-none focus:border-[#D4AF37]">
+          <option value="1">Memuat daftar tema...</option>
+        </select>
+      </div>
+
+      <div id="quran-tema-box" class="space-y-3 max-h-96 overflow-y-auto pr-1">
+        <p class="text-xs text-zinc-500 animate-pulse">Memuat ayat pilihan...</p>
+      </div>
+    </section>
+
+    <!-- 6. Berita Islami (Paling Bawah) -->
+    <section class="p-6 rounded-2xl bg-[#141414] border border-zinc-800 space-y-4">
+      <div class="flex justify-between items-center">
+        <h2 class="text-xs uppercase tracking-widest text-zinc-400 font-semibold">Artikel & Berita Islami</h2>
+        <span class="text-[11px] text-zinc-500">Update Terkini</span>
+      </div>
+      <div id="berita-container" class="space-y-3">
+        <p class="text-xs text-zinc-500 animate-pulse">Memuat artikel Islami...</p>
+      </div>
+    </section>
+
   </main>
 
   <script>
     const API_URL = "https://sholat-sman2karanganyar.yhanedy.workers.dev";
+    const MYQURAN_API = "https://api.myquran.com/v2";
 
-    // 1. Jadwal Sholat (Default fallback ke Karanganyar jika GPS ditolak)
-    function renderJadwal(timings) {
+    const BULAN_HIJRI = [
+      "", "Muharram", "Safar", "Rabiul Awal", "Rabiul Akhir",
+      "Jumadil Awal", "Jumadil Akhir", "Rajab", "Sya'ban",
+      "Ramadhan", "Syawal", "Dzulqa'dah", "Dzulhijjah"
+    ];
+
+    // ==========================================
+    // 1. KALENDER & HITUNG MUNDUR PUASA SUNNAH
+    // ==========================================
+    function hitungMundurPuasa(hijriData) {
+      const now = new Date();
+      const hariIni = now.getDay(); // 0=Minggu, 1=Senin, 2=Selasa, 3=Rabu, 4=Kamis, 5=Jumat, 6=Sabtu
+      const masehiStr = now.toLocaleDateString("id-ID", {
+        weekday: "long", day: "numeric", month: "long", year: "numeric"
+      });
+
+      const hDay = parseInt(hijriData.day, 10);
+      const hMonth = parseInt(hijriData.month.number, 10);
+      const hYear = hijriData.year;
+      document.getElementById("tanggal-hijriah").innerText = `${hDay} ${BULAN_HIJRI[hMonth]} ${hYear} H`;
+      document.getElementById("tanggal-masehi").innerText = masehiStr;
+
+      // Daftar target puasa sunnah (dalam satuan hari dari hari ini)
+      const kandidatPuasa = [];
+
+      // Cek apakah hari ini hari haram puasa (1 Syawal, 10-13 Dzulhijjah)
+      const isHaramPuasa = (hMonth === 10 && hDay === 1) || (hMonth === 12 && hDay >= 10 && hDay <= 13);
+
+      // A. Puasa Senin & Kamis (jika bukan bulan Ramadhan)
+      if (hMonth !== 9) {
+        const jarakSenin = (1 - hariIni + 7) % 7;
+        const jarakKamis = (4 - hariIni + 7) % 7;
+        if (!(jarakSenin === 0 && isHaramPuasa)) {
+          kandidatPuasa.push({ nama: "Puasa Sunnah Senin", hari: jarakSenin, ket: "Dianjurkan setiap hari Senin" });
+        }
+        if (!(jarakKamis === 0 && isHaramPuasa)) {
+          kandidatPuasa.push({ nama: "Puasa Sunnah Kamis", hari: jarakKamis, ket: "Dianjurkan setiap hari Kamis" });
+        }
+      }
+
+      // B. Puasa Ayyamul Bidh (13, 14, 15 Hijriah — kecuali 13 Dzulhijjah & Ramadhan)
+      if (hMonth !== 9) {
+        [13, 14, 15].forEach(tgl => {
+          if (hMonth === 12 && tgl === 13) return; // 13 Dzulhijjah adalah Hari Tasyrik
+          if (hDay <= tgl) {
+            kandidatPuasa.push({
+              nama: `Puasa Ayyamul Bidh (${tgl} ${BULAN_HIJRI[hMonth]})`,
+              hari: tgl - hDay,
+              ket: "Puasa pertengahan bulan (13, 14, 15 Hijriah)"
+            });
+          }
+        });
+      }
+
+      // C. Puasa Sunnah Tahunan Spesifik (Tasu'a, Asyura, Arafah, Syawal)
+      if (hMonth === 1 && hDay <= 9) {
+        kandidatPuasa.push({ nama: "Puasa Tasu'a (9 Muharram)", hari: 9 - hDay, ket: "Sunnah mengiringi Asyura" });
+      }
+      if (hMonth === 1 && hDay <= 10) {
+        kandidatPuasa.push({ nama: "Puasa Asyura (10 Muharram)", hari: 10 - hDay, ket: "Menghapus dosa setahun yang lalu" });
+      }
+      if (hMonth === 12 && hDay <= 9) {
+        kandidatPuasa.push({ nama: "Puasa Arafah (9 Dzulhijjah)", hari: 9 - hDay, ket: "Menghapus dosa setahun lalu & akan datang" });
+      }
+      if (hMonth === 10 && hDay >= 2 && hDay <= 7) {
+        kandidatPuasa.push({ nama: "Puasa 6 Hari Bulan Syawal", hari: 0, ket: "Pahala seperti berpuasa setahun penuh" });
+      }
+      if (hMonth === 9) {
+        kandidatPuasa.push({ nama: "Puasa Wajib Ramadhan", hari: 0, ket: "Bulan penuh keberkahan & ampunan" });
+      }
+
+      // Urutkan berdasarkan jarak hari terdekat
+      kandidatPuasa.sort((a, b) => a.hari - b.hari);
+
+      const terdekat = kandidatPuasa[0];
+      const box = document.getElementById("countdown-puasa-box");
+
+      if (!terdekat) {
+        box.innerHTML = `<div class="p-3 rounded-xl bg-[#1B1B1B] border border-zinc-800 text-xs text-zinc-400">Hari ini hari raya / tasyrik (diharamkan berpuasa).</div>`;
+        return;
+      }
+
+      const isHariIni = terdekat.hari === 0;
+      const labelWaktu = isHariIni ? "HARI INI" : (terdekat.hari === 1 ? "BESOK (H-1)" : `${terdekat.hari} HARI LAGI`);
+
+      box.innerHTML = `
+        <div class="p-3.5 rounded-xl ${isHariIni ? 'bg-[#D4AF37]/15 border border-[#D4AF37]' : 'bg-[#1B1B1B] border border-zinc-800'}">
+          <div class="flex justify-between items-center mb-1">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-[#D4AF37]">Hitung Mundur Puasa</span>
+            <span class="text-[11px] font-mono font-bold px-2 py-0.5 rounded bg-[#D4AF37] text-black">${labelWaktu}</span>
+          </div>
+          <p class="text-sm font-bold text-zinc-100 mt-1">${terdekat.nama}</p>
+          <p class="text-[11px] text-zinc-400 mt-0.5">${terdekat.ket}</p>
+        </div>
+      `;
+    }
+
+    // ==========================================
+    // 2. JADWAL SHOLAT (ALADHAN KEMENAG RI)
+    // ==========================================
+    function renderJadwal(dataAladhan) {
+      const timings = dataAladhan.timings;
       const list = [
         { name: 'Subuh', time: timings.Fajr },
         { name: 'Dzuhur', time: timings.Dhuhr },
@@ -101,13 +254,15 @@
           <p class="text-base sm:text-lg font-bold text-[#D4AF37]">${i.time}</p>
         </div>
       `).join('');
+
+      hitungMundurPuasa(dataAladhan.date.hijri);
     }
 
     async function loadDefaultKaranganyar() {
-      document.getElementById('lokasi-text').innerText = "Karanganyar, Jawa Tengah";
+      document.getElementById('lokasi-text').innerText = "SMAN 2 Karanganyar • Jawa Tengah";
       const res = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=Karanganyar&country=Indonesia&method=20`);
       const data = await res.json();
-      renderJadwal(data.data.timings);
+      renderJadwal(data.data);
     }
 
     if ("geolocation" in navigator) {
@@ -115,16 +270,16 @@
         const { latitude, longitude } = pos.coords;
         const res = await fetch(`https://api.aladhan.com/v1/timings?latitude=${latitude}&longitude=${longitude}&method=20`);
         const data = await res.json();
-        document.getElementById('lokasi-text').innerText = `GPS Aktif • ${data.data.meta.timezone}`;
-        renderJadwal(data.data.timings);
-      }, () => {
-        loadDefaultKaranganyar();
-      });
+        document.getElementById('lokasi-text').innerText = `SMAN 2 Karanganyar • GPS Aktif`;
+        renderJadwal(data.data);
+      }, () => loadDefaultKaranganyar());
     } else {
       loadDefaultKaranganyar();
     }
 
-    // 2. Muat Semua Konten (Kajian, Doa, Motivasi) dari Cloudflare Worker
+    // ==========================================
+    // 3. MOTIVASI & DOA SEKOLAH (TURSO WORKER)
+    // ==========================================
     let motivasiList = [], motivasiIdx = 0;
 
     function showMotivasi() {
@@ -143,63 +298,155 @@
     fetch(API_URL)
       .then(res => res.json())
       .then(data => {
-        // Render Motivasi
         motivasiList = data.motivasi || [];
-        if (motivasiList.length > 0) {
-          showMotivasi();
-        } else {
-          document.getElementById('motivasi-teks').innerText = '"Belum ada kutipan motivasi."';
-        }
+        if (motivasiList.length > 0) showMotivasi();
+        else document.getElementById('motivasi-teks').innerText = '"Belum ada kutipan motivasi."';
 
-        // Render Doa
-        const doaBox = document.getElementById('doa-container');
+        const doaBox = document.getElementById('doa-rohis-box');
         doaBox.innerHTML = (data.doa || []).map(d => `
           <div class="p-3.5 rounded-xl bg-[#1B1B1B] border border-zinc-800/60">
             <p class="text-xs font-semibold text-[#D4AF37] mb-1">${d.judul}</p>
             <p class="text-right text-lg font-serif my-2 leading-relaxed">${d.arab}</p>
             <p class="text-xs text-zinc-400">${d.arti}</p>
           </div>
-        `).join('') || '<p class="text-xs text-zinc-500">Belum ada data doa.</p>';
-
-        // Render Kajian
-        const kajianBox = document.getElementById('kajian-container');
-        kajianBox.innerHTML = (data.kajian || []).map(k => `
-          <div class="p-4 rounded-xl bg-[#1B1B1B] border border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <h3 class="font-semibold text-zinc-100">${k.judul}</h3>
-              <p class="text-xs text-zinc-400 mt-1">${k.pemateri} • ${k.waktu} • ${k.lokasi}</p>
-            </div>
-            ${k.ig_url ? `<a href="${k.ig_url}" target="_blank" rel="noopener noreferrer" class="px-4 py-2 rounded-lg bg-zinc-900 border border-[#D4AF37]/40 text-[#D4AF37] text-xs font-medium hover:bg-[#D4AF37] hover:text-black transition text-center">Lihat Poster IG ↗</a>` : ''}
-          </div>
-        `).join('') || '<p class="text-xs text-zinc-500">Belum ada jadwal kajian terdekat.</p>';
-      })
-      .catch(err => {
-        console.error("Gagal memuat data dari Worker:", err);
+        `).join('') || '<p class="text-xs text-zinc-500">Belum ada data doa sekolah.</p>';
       });
 
-    // 3. Timer Pomodoro
-    let seconds = 1500, interval = null;
-    function updateDisplay() {
-      const m = String(Math.floor(seconds / 60)).padStart(2, '0');
-      const s = String(seconds % 60).padStart(2, '0');
-      document.getElementById('timer-display').innerText = `${m}:${s}`;
-    }
-    function toggleTimer() {
-      const btn = document.getElementById('btn-start');
-      if (interval) { clearInterval(interval); interval = null; btn.innerText = "Lanjut Fokus"; }
-      else {
-        btn.innerText = "Jeda";
-        interval = setInterval(() => {
-          if (seconds > 0) { seconds--; updateDisplay(); }
-          else { clearInterval(interval); alert("Waktu belajar selesai! Cek jadwal sholat."); }
-        }, 1000);
+    // ==========================================
+    // 4. ASMAUL HUSNA ACAK (MYQURAN API)
+    // ==========================================
+    async function loadAsmaulHusna() {
+      const box = document.getElementById("husna-container");
+      try {
+        const res = await fetch(`${MYQURAN_API}/husna/acak`);
+        const json = await res.json();
+        const d = json.data;
+        box.innerHTML = `
+          <span class="text-[10px] px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400">No. ${d.id}</span>
+          <p class="text-3xl font-serif text-[#D4AF37] py-1">${d.arab}</p>
+          <p class="text-sm font-bold text-white">${d.latin}</p>
+          <p class="text-xs text-zinc-400 leading-relaxed">${d.indo}</p>
+        `;
+      } catch (e) {
+        box.innerHTML = `<p class="text-xs text-red-400">Gagal memuat Asmaul Husna.</p>`;
       }
     }
-    function resetTimer() {
-      clearInterval(interval); interval = null; seconds = 1500;
-      document.getElementById('btn-start').innerText = "Mulai Fokus";
-      updateDisplay();
+    loadAsmaulHusna();
+
+    // ==========================================
+    // 5. DOA HARIAN ACAK (MYQURAN API)
+    // ==========================================
+    function switchDoaTab(tab) {
+      const isAcak = tab === "acak";
+      document.getElementById("panel-doa-acak").classList.toggle("hidden", !isAcak);
+      document.getElementById("panel-doa-rohis").classList.toggle("hidden", isAcak);
+      document.getElementById("btn-doa-acak").className = isAcak
+        ? "px-3 py-1 rounded-lg bg-[#D4AF37] text-black text-xs font-bold"
+        : "px-3 py-1 rounded-lg bg-zinc-800 text-zinc-300 text-xs font-semibold";
+      document.getElementById("btn-doa-rohis").className = !isAcak
+        ? "px-3 py-1 rounded-lg bg-[#D4AF37] text-black text-xs font-bold"
+        : "px-3 py-1 rounded-lg bg-zinc-800 text-zinc-300 text-xs font-semibold";
     }
+
+    async function loadDoaAcak() {
+      const box = document.getElementById("doa-acak-box");
+      try {
+        const res = await fetch(`${MYQURAN_API}/doa/acak`);
+        const json = await res.json();
+        const d = json.data;
+        box.innerHTML = `
+          <div class="flex justify-between items-center mb-2">
+            <p class="text-xs font-bold text-[#D4AF37]">${d.judul}</p>
+            <span class="text-[10px] text-zinc-500 uppercase">${d.source || 'Doa Harian'}</span>
+          </div>
+          <p class="text-right text-xl font-serif text-zinc-100 my-3 leading-loose">${d.arab}</p>
+          <p class="text-xs text-zinc-300 leading-relaxed">${d.indo}</p>
+        `;
+      } catch (e) {
+        box.innerHTML = `<p class="text-xs text-red-400">Gagal memuat doa harian.</p>`;
+      }
+    }
+    loadDoaAcak();
+
+    // ==========================================
+    // 6. AL-QUR'AN PER TEMA (MYQURAN API)
+    // ==========================================
+    async function initDaftarTema() {
+      const select = document.getElementById("tema-select");
+      try {
+        const res = await fetch(`${MYQURAN_API}/quran/tema/semua`);
+        const json = await res.json();
+        const listTema = json.data || [];
+        if (listTema.length > 0) {
+          select.innerHTML = listTema.map(t => `<option value="${t.id}">${t.name}</option>`).join("");
+          loadQuranTema(listTema[0].id);
+        }
+      } catch (e) {
+        select.innerHTML = `<option value="1">Tema Pilihan</option>`;
+        loadQuranTema(1);
+      }
+    }
+
+    async function loadQuranTema(id) {
+      const box = document.getElementById("quran-tema-box");
+      box.innerHTML = `<p class="text-xs text-zinc-500 animate-pulse">Memuat ayat...</p>`;
+      try {
+        const res = await fetch(`${MYQURAN_API}/quran/tema/${id}`);
+        const json = await res.json();
+        const ayatList = json.data?.ayat || json.data || [];
+        
+        if (!Array.isArray(ayatList) || ayatList.length === 0) {
+          box.innerHTML = `<p class="text-xs text-zinc-500">Ayat untuk tema ini belum tersedia.</p>`;
+          return;
+        }
+
+        box.innerHTML = ayatList.slice(0, 5).map(a => `
+          <div class="p-4 rounded-xl bg-[#1B1B1B] border border-zinc-800/80 space-y-2">
+            <div class="flex justify-between items-center">
+              <span class="text-[11px] font-semibold text-[#D4AF37]">QS. ${a.surah || ''} : ${a.ayah || a.ayat || ''}</span>
+            </div>
+            <p class="text-right text-lg font-serif text-zinc-100 leading-loose">${a.arab || ''}</p>
+            <p class="text-xs text-zinc-400 leading-relaxed">${a.text || a.indo || ''}</p>
+          </div>
+        `).join("");
+      } catch (e) {
+        box.innerHTML = `<p class="text-xs text-red-400">Gagal memuat ayat Al-Qur'an.</p>`;
+      }
+    }
+    initDaftarTema();
+
+    // ==========================================
+    // 7. BERITA ISLAMI (VIA WORKER PROXY)
+    // ==========================================
+    async function loadBeritaIslam() {
+      const box = document.getElementById("berita-container");
+      try {
+        const res = await fetch(`${API_URL}?type=berita`);
+        const json = await res.json();
+        const articles = Array.isArray(json) ? json : (json.data || json.articles || []);
+
+        if (articles.length === 0) {
+          box.innerHTML = `<p class="text-xs text-zinc-500">Belum ada artikel tersedia saat ini.</p>`;
+          return;
+        }
+
+        box.innerHTML = articles.slice(0, 5).map(item => `
+          <a href="${item.url || item.link || '#'}" target="_blank" rel="noopener noreferrer" 
+             class="block p-4 rounded-xl bg-[#1B1B1B] border border-zinc-800/80 hover:border-[#D4AF37]/50 transition group">
+            <div class="flex justify-between items-start gap-3">
+              <div>
+                <h3 class="text-sm font-semibold text-zinc-100 group-hover:text-[#D4AF37] transition">${item.title || item.judul}</h3>
+                <p class="text-[11px] text-zinc-400 mt-1 line-clamp-2">${item.description || item.date || 'Klik untuk membaca selengkapnya'}</p>
+              </div>
+              <span class="text-xs text-[#D4AF37] shrink-0">Baca ↗</span>
+            </div>
+          </a>
+        `).join("");
+      } catch (e) {
+        box.innerHTML = `<p class="text-xs text-zinc-500">Tidak dapat memuat berita Islami saat ini.</p>`;
+      }
+    }
+    loadBeritaIslam();
   </script>
 </body>
 </html>
