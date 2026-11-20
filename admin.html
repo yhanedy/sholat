@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Rohis - NoorStudent</title>
+  <title>Admin Rohis SMAN 2 Karanganyar - NoorStudent</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>body { background-color: #0B0B0B; color: #F4F4F5; font-family: sans-serif; }</style>
 </head>
@@ -12,7 +12,7 @@
   <!-- Form Login -->
   <div id="login-box" class="max-w-sm mx-auto mt-20 p-6 rounded-2xl bg-[#141414] border border-zinc-800">
     <h1 class="text-lg font-bold text-[#D4AF37] mb-1">Admin Panel Rohis</h1>
-    <p class="text-xs text-zinc-400 mb-4">Masukkan password untuk mengelola konten web.</p>
+    <p class="text-xs text-zinc-400 mb-4">SMAN 2 Karanganyar • Masukkan password pengelola.</p>
     <input type="password" id="admin-pass" placeholder="Password Admin..." class="w-full p-3 rounded-xl bg-[#1C1C1C] border border-zinc-700 text-sm mb-3 focus:outline-none focus:border-[#D4AF37]" />
     <button onclick="loginAdmin()" class="w-full py-2.5 rounded-xl bg-[#D4AF37] text-black font-semibold text-sm hover:bg-[#c29f2f]">Masuk</button>
     <p id="login-err" class="text-xs text-red-400 mt-2 hidden">Password salah atau gagal terhubung.</p>
@@ -22,8 +22,8 @@
   <div id="dashboard-box" class="max-w-4xl mx-auto hidden space-y-6">
     <div class="flex justify-between items-center border-b border-zinc-800 pb-4">
       <div>
-        <h1 class="text-xl font-bold text-[#D4AF37]">Dashboard Konten NoorStudent</h1>
-        <p class="text-xs text-zinc-400">Kelola Kajian, Doa Pelajar, dan Hadits Motivasi</p>
+        <h1 class="text-xl font-bold text-[#D4AF37]">Dashboard Konten Rohis</h1>
+        <p class="text-xs text-zinc-400">SMAN 2 Karanganyar • Kelola Kajian, Doa, dan Hadits</p>
       </div>
       <div class="flex gap-2">
         <a href="/" class="px-3 py-1.5 rounded-lg bg-zinc-800 text-xs hover:bg-zinc-700">Lihat Web ↗</a>
@@ -88,12 +88,13 @@
   </div>
 
   <script>
+    const API_URL = "https://sholat-sman2karanganyar.yhanedy.workers.dev";
     let savedPass = sessionStorage.getItem("adminPass") || "";
     if (savedPass) showDashboard();
 
     async function loginAdmin() {
       const pass = document.getElementById("admin-pass").value;
-      const res = await fetch("/api/data", {
+      const res = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password: pass, action: "test" })
@@ -129,7 +130,7 @@
     }
 
     async function loadAllData() {
-      const res = await fetch("/api/data");
+      const res = await fetch(API_URL);
       const data = await res.json();
 
       document.getElementById("list-kajian").innerHTML = (data.kajian || []).map(k => `
@@ -155,7 +156,7 @@
       e.preventDefault();
       const formData = new FormData(e.target);
       const payload = Object.fromEntries(formData.entries());
-      await fetch("/api/data", {
+      await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password: savedPass, action: "add", table, payload })
@@ -166,7 +167,7 @@
 
     async function deleteItem(table, id) {
       if (!confirm("Yakin ingin menghapus item ini?")) return;
-      await fetch("/api/data", {
+      await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password: savedPass, action: "delete", table, id })
@@ -177,7 +178,7 @@
     async function updatePassword(e) {
       e.preventDefault();
       const newPassword = document.getElementById("new-pass").value;
-      const res = await fetch("/api/data", {
+      const res = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password: savedPass, action: "change_password", payload: { newPassword } })
