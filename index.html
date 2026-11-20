@@ -25,14 +25,15 @@
 
   <main class="max-w-3xl mx-auto px-4 mt-6 space-y-6">
 
-    <!-- 1. Daily Hadits & Motivasi (Di Atas Times Prayer) -->
-    <section class="p-5 rounded-2xl bg-[#141414] border border-[#D4AF37]/30 relative overflow-hidden">
-      <div class="flex justify-between items-center mb-2">
-        <span class="text-[11px] uppercase tracking-widest text-[#D4AF37] font-semibold">Daily Hadits & Motivasi</span>
-        <button onclick="nextMotivasi()" class="text-xs text-zinc-400 hover:text-white">Ganti Kutipan ↻</button>
+    <!-- 1. Daily Hadits Acak (API MyQuran) - Di Atas Times Prayer -->
+    <section class="p-5 rounded-2xl bg-[#141414] border border-[#D4AF37]/30 relative overflow-hidden space-y-3">
+      <div class="flex justify-between items-center">
+        <span class="text-[11px] uppercase tracking-widest text-[#D4AF37] font-semibold">Hadits Pilihan Hari Ini</span>
+        <button onclick="loadHaditsAcak()" class="text-xs text-zinc-400 hover:text-[#D4AF37] transition">Ganti Hadits ↻</button>
       </div>
-      <p id="motivasi-teks" class="text-sm text-zinc-200 italic leading-relaxed">"Memuat kutipan..."</p>
-      <p id="motivasi-sumber" class="text-xs text-[#D4AF37] mt-2 font-semibold"></p>
+      <div id="hadits-container" class="space-y-2">
+        <p class="text-xs text-zinc-500 animate-pulse">Memuat hadits acak...</p>
+      </div>
     </section>
 
     <!-- 2. Jadwal Sholat (Times Prayer) -->
@@ -146,11 +147,47 @@
     ];
 
     // ==========================================
-    // 1. KALENDER & HITUNG MUNDUR PUASA SUNNAH
+    // 1. HADITS ACAK (API MYQURAN - ARBAIN / BULUGHUL MARAM)
+    // ==========================================
+    async function loadHaditsAcak() {
+      const box = document.getElementById("hadits-container");
+      box.innerHTML = `<p class="text-xs text-zinc-500 animate-pulse">Mengambil hadits...</p>`;
+      try {
+        // Menggunakan Hadits Arbain Nawawi acak dari API MyQuran (ringkas & cocok untuk pelajar)
+        const res = await fetch(`${MYQURAN_API}/hadits/arbain/acak`);
+        const json = await res.json();
+        const d = json.data;
+
+        box.innerHTML = `
+          <p class="text-xs font-bold text-zinc-100">${d.judul || 'Hadits Arbain'}</p>
+          <p class="text-right text-lg font-serif text-zinc-100 leading-loose py-1">${d.arab || ''}</p>
+          <p class="text-xs text-zinc-300 italic leading-relaxed">"${d.indo || ''}"</p>
+          <p class="text-[11px] text-[#D4AF37] font-semibold pt-1">— Hadits Arbain No. ${d.no || ''}</p>
+        `;
+      } catch (e) {
+        // Fallback jika endpoint arbain bermasalah, coba endpoint Bulughul Maram
+        try {
+          const res2 = await fetch(`${MYQURAN_API}/hadits/bm/acak`);
+          const json2 = await res2.json();
+          const d2 = json2.data;
+          box.innerHTML = `
+            <p class="text-right text-lg font-serif text-zinc-100 leading-loose py-1">${d2.ar || ''}</p>
+            <p class="text-xs text-zinc-300 italic leading-relaxed">"${d2.id || ''}"</p>
+            <p class="text-[11px] text-[#D4AF37] font-semibold pt-1">— HR. Bulughul Maram No. ${d2.no || ''}</p>
+          `;
+        } catch (err2) {
+          box.innerHTML = `<p class="text-xs text-zinc-500">Gagal memuat hadits saat ini.</p>`;
+        }
+      }
+    }
+    loadHaditsAcak();
+
+    // ==========================================
+    // 2. KALENDER & HITUNG MUNDUR PUASA SUNNAH
     // ==========================================
     function hitungMundurPuasa(hijriData) {
       const now = new Date();
-      const hariIni = now.getDay(); // 0=Minggu, 1=Senin, 2=Selasa, 3=Rabu, 4=Kamis, 5=Jumat, 6=Sabtu
+      const hariIni = now.getDay();
       const masehiStr = now.toLocaleDateString("id-ID", {
         weekday: "long", day: "numeric", month: "long", year: "numeric"
       });
@@ -161,13 +198,10 @@
       document.getElementById("tanggal-hijriah").innerText = `${hDay} ${BULAN_HIJRI[hMonth]} ${hYear} H`;
       document.getElementById("tanggal-masehi").innerText = masehiStr;
 
-      // Daftar target puasa sunnah (dalam satuan hari dari hari ini)
       const kandidatPuasa = [];
-
-      // Cek apakah hari ini hari haram puasa (1 Syawal, 10-13 Dzulhijjah)
       const isHaramPuasa = (hMonth === 10 && hDay === 1) || (hMonth === 12 && hDay >= 10 && hDay <= 13);
 
-      // A. Puasa Senin & Kamis (jika bukan bulan Ramadhan)
+      // Puasa Senin & Kamis
       if (hMonth !== 9) {
         const jarakSenin = (1 - hariIni + 7) % 7;
         const jarakKamis = (4 - hariIni + 7) % 7;
@@ -179,10 +213,10 @@
         }
       }
 
-      // B. Puasa Ayyamul Bidh (13, 14, 15 Hijriah — kecuali 13 Dzulhijjah & Ramadhan)
+      // Puasa Ayyamul Bidh (13, 14, 15 Hijriah)
       if (hMonth !== 9) {
         [13, 14, 15].forEach(tgl => {
-          if (hMonth === 12 && tgl === 13) return; // 13 Dzulhijjah adalah Hari Tasyrik
+          if (hMonth === 12 && tgl === 13) return;
           if (hDay <= tgl) {
             kandidatPuasa.push({
               nama: `Puasa Ayyamul Bidh (${tgl} ${BULAN_HIJRI[hMonth]})`,
@@ -193,7 +227,7 @@
         });
       }
 
-      // C. Puasa Sunnah Tahunan Spesifik (Tasu'a, Asyura, Arafah, Syawal)
+      // Puasa Sunnah Tahunan Spesifik
       if (hMonth === 1 && hDay <= 9) {
         kandidatPuasa.push({ nama: "Puasa Tasu'a (9 Muharram)", hari: 9 - hDay, ket: "Sunnah mengiringi Asyura" });
       }
@@ -210,7 +244,6 @@
         kandidatPuasa.push({ nama: "Puasa Wajib Ramadhan", hari: 0, ket: "Bulan penuh keberkahan & ampunan" });
       }
 
-      // Urutkan berdasarkan jarak hari terdekat
       kandidatPuasa.sort((a, b) => a.hari - b.hari);
 
       const terdekat = kandidatPuasa[0];
@@ -237,7 +270,7 @@
     }
 
     // ==========================================
-    // 2. JADWAL SHOLAT (ALADHAN KEMENAG RI)
+    // 3. JADWAL SHOLAT (ALADHAN KEMENAG RI)
     // ==========================================
     function renderJadwal(dataAladhan) {
       const timings = dataAladhan.timings;
@@ -278,30 +311,11 @@
     }
 
     // ==========================================
-    // 3. MOTIVASI & DOA SEKOLAH (TURSO WORKER)
+    // 4. DOA SEKOLAH (TURSO WORKER)
     // ==========================================
-    let motivasiList = [], motivasiIdx = 0;
-
-    function showMotivasi() {
-      if (motivasiList.length === 0) return;
-      const item = motivasiList[motivasiIdx];
-      document.getElementById('motivasi-teks').innerText = `"${item.teks}"`;
-      document.getElementById('motivasi-sumber').innerText = `— ${item.sumber}`;
-    }
-
-    function nextMotivasi() {
-      if (motivasiList.length === 0) return;
-      motivasiIdx = (motivasiIdx + 1) % motivasiList.length;
-      showMotivasi();
-    }
-
     fetch(API_URL)
       .then(res => res.json())
       .then(data => {
-        motivasiList = data.motivasi || [];
-        if (motivasiList.length > 0) showMotivasi();
-        else document.getElementById('motivasi-teks').innerText = '"Belum ada kutipan motivasi."';
-
         const doaBox = document.getElementById('doa-rohis-box');
         doaBox.innerHTML = (data.doa || []).map(d => `
           <div class="p-3.5 rounded-xl bg-[#1B1B1B] border border-zinc-800/60">
@@ -313,7 +327,7 @@
       });
 
     // ==========================================
-    // 4. ASMAUL HUSNA ACAK (MYQURAN API)
+    // 5. ASMAUL HUSNA ACAK (MYQURAN API)
     // ==========================================
     async function loadAsmaulHusna() {
       const box = document.getElementById("husna-container");
@@ -334,7 +348,7 @@
     loadAsmaulHusna();
 
     // ==========================================
-    // 5. DOA HARIAN ACAK (MYQURAN API)
+    // 6. DOA HARIAN ACAK (MYQURAN API)
     // ==========================================
     function switchDoaTab(tab) {
       const isAcak = tab === "acak";
@@ -369,7 +383,7 @@
     loadDoaAcak();
 
     // ==========================================
-    // 6. AL-QUR'AN PER TEMA (MYQURAN API)
+    // 7. AL-QUR'AN PER TEMA (MYQURAN API)
     // ==========================================
     async function initDaftarTema() {
       const select = document.getElementById("tema-select");
@@ -416,7 +430,7 @@
     initDaftarTema();
 
     // ==========================================
-    // 7. BERITA ISLAMI (VIA WORKER PROXY)
+    // 8. BERITA ISLAMI (VIA WORKER PROXY)
     // ==========================================
     async function loadBeritaIslam() {
       const box = document.getElementById("berita-container");
