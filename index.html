@@ -10,7 +10,7 @@
   <style>
     body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0B0B0B; color: #F4F4F5; }
 
-    /* Styling Bottom Navigation Mobile (Black & Gold Theme) */
+    /* Bottom Navigation Mobile (Black & Gold Theme) */
     .bottom-nav {
       position: fixed;
       bottom: 0;
@@ -130,12 +130,16 @@
       </div>
     </section>
 
-    <!-- 5. Al-Qur'an Per Tema (MyQuran API) -->
+    <!-- 5. Al-Qur'an Per Tema (EQuran.id API v2 - Pasti Muncul) -->
     <section class="p-5 rounded-2xl bg-[#141414] border border-zinc-800 space-y-4">
       <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
         <h2 class="text-xs uppercase tracking-widest text-zinc-400 font-semibold shrink-0">Al-Qur'an Per Tema</h2>
         <select id="tema-select" onchange="loadQuranTema(this.value)" class="w-full sm:max-w-xs truncate p-2 rounded-lg bg-[#1C1C1C] border border-zinc-700 text-xs text-zinc-200 focus:outline-none focus:border-[#D4AF37]">
-          <option value="1">Memuat daftar tema...</option>
+          <option value="ilmu">Menuntut Ilmu & Wahyu Pertama</option>
+          <option value="sabar">Ketenangan Hati & Ujian Hidup</option>
+          <option value="orangtua">Berbakti Kepada Orang Tua</option>
+          <option value="optimis">Semangat & Tidak Berputus Asa</option>
+          <option value="akhlak">Akhlak & Pergaulan Remaja</option>
         </select>
       </div>
 
@@ -144,11 +148,11 @@
       </div>
     </section>
 
-    <!-- 6. Berita Islami (Paling Bawah) -->
+    <!-- 6. Berita Islami Terkini (Paling Bawah) -->
     <section class="p-5 rounded-2xl bg-[#141414] border border-zinc-800 space-y-4">
       <div class="flex justify-between items-center">
         <h2 class="text-xs uppercase tracking-widest text-zinc-400 font-semibold">Artikel & Berita Islami</h2>
-        <span class="text-[11px] text-zinc-500">Update Terkini</span>
+        <span class="text-[11px] text-[#D4AF37]">Khazanah Islam</span>
       </div>
       <div id="berita-container" class="space-y-3">
         <p class="text-xs text-zinc-500 animate-pulse">Memuat artikel Islami...</p>
@@ -164,6 +168,7 @@
   <script>
     const API_URL = "https://sholat-sman2karanganyar.yhanedy.workers.dev";
     const MYQURAN_API = "https://api.myquran.com/v2";
+    const EQURAN_API = "https://equran.id/api/v2";
 
     const BULAN_HIJRI = [
       "", "Muharram", "Safar", "Rabiul Awal", "Rabiul Akhir",
@@ -396,89 +401,103 @@
     loadAsmaulHusna();
 
     // ==========================================
-    // 6. AL-QUR'AN PER TEMA (MYQURAN API - DIPERBAIKI)
+    // 6. AL-QUR'AN PER TEMA (EQURAN.ID API V2)
     // ==========================================
-    async function initDaftarTema() {
-      const select = document.getElementById("tema-select");
-      try {
-        const res = await fetch(`${MYQURAN_API}/quran/tema/semua`);
-        const json = await res.json();
-        const listTema = json.data || [];
-        if (listTema.length > 0) {
-          select.innerHTML = listTema.map(t => `<option value="${t.id}">${t.name}</option>`).join("");
-          // Pilih tema kedua atau pertama yang memiliki ayat
-          loadQuranTema(listTema[0].id);
-        }
-      } catch (e) {
-        select.innerHTML = `<option value="1">Tema Pilihan</option>`;
-        loadQuranTema(1);
-      }
-    }
+    const TEMA_QURAN = {
+      ilmu: [
+        { surat: 96, ayat: [1, 2, 3, 4, 5] }, // Al-'Alaq: Perintah membaca & ilmu
+        { surat: 58, ayat: [11] }             // Al-Mujadilah: Derajat orang berilmu
+      ],
+      sabar: [
+        { surat: 94, ayat: [1, 2, 3, 4, 5, 6, 7, 8] }, // Al-Insyirah: Bersama kesulitan ada kemudahan
+        { surat: 2, ayat: [153] }                       // Al-Baqarah: Sabar & Sholat
+      ],
+      orangtua: [
+        { surat: 17, ayat: [23, 24] }, // Al-Isra: Berbakti pada orang tua
+        { surat: 31, ayat: [14] }      // Luqman: Bersyukur & berbuat baik pada orang tua
+      ],
+      optimis: [
+        { surat: 93, ayat: [1, 2, 3, 4, 5, 6, 7, 8] }, // Ad-Dhuha: Tuhanmu tidak meninggalkanmu
+        { surat: 39, ayat: [53] }                       // Az-Zumar: Jangan berputus asa dari rahmat Allah
+      ],
+      akhlak: [
+        { surat: 49, ayat: [11, 12] }, // Al-Hujurat: Larangan menghina & ghibah
+        { surat: 31, ayat: [18, 19] }  // Luqman: Larangan sombong & adab berbicara
+      ]
+    };
 
-    async function loadQuranTema(id) {
+    async function loadQuranTema(temaKey) {
       const box = document.getElementById("quran-tema-box");
-      box.innerHTML = `<p class="text-xs text-zinc-500 animate-pulse">Memuat ayat...</p>`;
+      box.innerHTML = `<p class="text-xs text-zinc-500 animate-pulse">Memuat ayat pilihan...</p>`;
+      const daftarTarget = TEMA_QURAN[temaKey] || TEMA_QURAN.ilmu;
+
       try {
-        const res = await fetch(`${MYQURAN_API}/quran/tema/${id}`);
-        const json = await res.json();
-        
-        // Menangani berbagai variasi struktur JSON dari endpoint tema MyQuran
-        let ayatList = [];
-        if (Array.isArray(json.data)) {
-          ayatList = json.data;
-        } else if (json.data && Array.isArray(json.data.ayat)) {
-          ayatList = json.data.ayat;
-        } else if (json.data && typeof json.data === 'object') {
-          ayatList = Object.values(json.data).filter(item => item && typeof item === 'object' && (item.arab || item.text));
+        const hasilAyat = [];
+        for (const item of daftarTarget) {
+          const res = await fetch(`${EQURAN_API}/surat/${item.surat}`);
+          const json = await res.json();
+          const dataSurat = json.data;
+          if (dataSurat && dataSurat.ayat) {
+            const ayatTerpilih = dataSurat.ayat.filter(a => item.ayat.includes(a.nomorAyat));
+            ayatTerpilih.forEach(a => {
+              hasilAyat.push({
+                namaSurat: dataSurat.namaLatin,
+                nomorAyat: a.nomorAyat,
+                arab: a.teksArab,
+                latin: a.teksLatin,
+                indo: a.teksIndonesia
+              });
+            });
+          }
         }
 
-        if (ayatList.length === 0) {
-          box.innerHTML = `<p class="text-xs text-zinc-500">Ayat untuk tema ini belum tersedia. Silakan pilih tema lain di menu atas.</p>`;
-          return;
-        }
-
-        box.innerHTML = ayatList.slice(0, 6).map(a => `
+        box.innerHTML = hasilAyat.map(a => `
           <div class="p-4 rounded-xl bg-[#1B1B1B] border border-zinc-800/80 space-y-2">
             <div class="flex justify-between items-center">
-              <span class="text-[11px] font-semibold text-[#D4AF37]">QS. ${a.surah_name || a.surah || ''} : ${a.ayah || a.ayat || ''}</span>
+              <span class="text-[11px] font-semibold text-[#D4AF37]">QS. ${a.namaSurat} : ${a.nomorAyat}</span>
             </div>
-            <p class="text-right text-lg font-serif text-zinc-100 leading-loose">${a.arab || a.ar || ''}</p>
-            <p class="text-xs text-zinc-400 leading-relaxed">${a.text || a.indo || a.id || ''}</p>
+            <p class="text-right text-xl font-serif text-zinc-100 leading-loose py-1">${a.arab}</p>
+            <p class="text-[11px] text-[#D4AF37]/80 italic">${a.latin}</p>
+            <p class="text-xs text-zinc-300 leading-relaxed">${a.indo}</p>
           </div>
         `).join("");
       } catch (e) {
-        box.innerHTML = `<p class="text-xs text-red-400">Gagal memuat ayat Al-Qur'an.</p>`;
+        box.innerHTML = `<p class="text-xs text-red-400">Gagal memuat ayat Al-Qur'an. Periksa koneksi internet.</p>`;
       }
     }
-    initDaftarTema();
+    loadQuranTema("ilmu");
 
     // ==========================================
-    // 7. BERITA ISLAMI (VIA WORKER PROXY)
+    // 7. BERITA ISLAMI TERKINI (VIA WORKER PROXY)
     // ==========================================
     async function loadBeritaIslam() {
       const box = document.getElementById("berita-container");
       try {
         const res = await fetch(`${API_URL}?type=berita`);
         const json = await res.json();
-        const articles = Array.isArray(json) ? json : (json.data || json.articles || []);
+        const articles = json.data || [];
 
         if (articles.length === 0) {
           box.innerHTML = `<p class="text-xs text-zinc-500">Belum ada artikel tersedia saat ini.</p>`;
           return;
         }
 
-        box.innerHTML = articles.slice(0, 5).map(item => `
-          <a href="${item.url || item.link || '#'}" target="_blank" rel="noopener noreferrer" 
-             class="block p-4 rounded-xl bg-[#1B1B1B] border border-zinc-800/80 hover:border-[#D4AF37]/50 transition group">
-            <div class="flex justify-between items-start gap-3">
-              <div>
-                <h3 class="text-sm font-semibold text-zinc-100 group-hover:text-[#D4AF37] transition">${item.title || item.judul}</h3>
-                <p class="text-[11px] text-zinc-400 mt-1 line-clamp-2">${item.description || item.date || 'Klik untuk membaca selengkapnya'}</p>
+        box.innerHTML = articles.map(item => {
+          const tgl = item.pubDate ? new Date(item.pubDate).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }) : "";
+          return `
+            <a href="${item.link}" target="_blank" rel="noopener noreferrer" 
+               class="block p-4 rounded-xl bg-[#1B1B1B] border border-zinc-800/80 hover:border-[#D4AF37]/50 transition group">
+              <div class="flex justify-between items-start gap-3">
+                <div>
+                  <span class="text-[10px] text-[#D4AF37] font-semibold">${tgl}</span>
+                  <h3 class="text-sm font-semibold text-zinc-100 group-hover:text-[#D4AF37] transition mt-0.5">${item.title}</h3>
+                  <p class="text-[11px] text-zinc-400 mt-1 line-clamp-2">${item.description}</p>
+                </div>
+                <span class="text-xs text-[#D4AF37] shrink-0 mt-1">Baca ↗</span>
               </div>
-              <span class="text-xs text-[#D4AF37] shrink-0">Baca ↗</span>
-            </div>
-          </a>
-        `).join("");
+            </a>
+          `;
+        }).join("");
       } catch (e) {
         box.innerHTML = `<p class="text-xs text-zinc-500">Tidak dapat memuat berita Islami saat ini.</p>`;
       }
