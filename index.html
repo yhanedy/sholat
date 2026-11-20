@@ -6,11 +6,49 @@
   <title>Santri Sabilil Muttaqin - SMAN 2 Karanganyar</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <style>
     body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0B0B0B; color: #F4F4F5; }
+
+    /* Styling Bottom Navigation Mobile (Black & Gold Theme) */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      background-color: rgba(17, 17, 17, 0.95);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid #27272a;
+      padding: 0.6rem 0.5rem;
+    }
+    .bottom-nav .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #a1a1aa;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .bottom-nav .nav-item i {
+      font-size: 1.1rem;
+    }
+    .bottom-nav .nav-item.active,
+    .bottom-nav .nav-item:hover {
+      color: #D4AF37;
+    }
+    @media (min-width: 768px) {
+      .bottom-nav { display: none; }
+    }
   </style>
 </head>
-<body class="min-h-screen pb-12 selection:bg-[#D4AF37] selection:text-black">
+<body class="min-h-screen pb-24 md:pb-12 selection:bg-[#D4AF37] selection:text-black">
 
   <!-- Header -->
   <header class="border-b border-zinc-800 bg-[#111111]/90 backdrop-blur-md sticky top-0 z-10">
@@ -81,39 +119,22 @@
       </section>
     </div>
 
-    <!-- 4. Doa Harian (Tab: Doa Acak MyQuran & Doa Sekolah Rohis) -->
-    <section class="p-5 rounded-2xl bg-[#141414] border border-zinc-800 space-y-4">
-      <div class="flex flex-wrap justify-between items-center gap-2">
-        <h2 class="text-xs uppercase tracking-widest text-zinc-400 font-semibold">Doa Harian & Pelajar</h2>
-        <div class="flex gap-1.5">
-          <button onclick="switchDoaTab('acak')" id="btn-doa-acak" class="px-3 py-1 rounded-lg bg-[#D4AF37] text-black text-xs font-bold">Doa Harian (Acak)</button>
-          <button onclick="switchDoaTab('rohis')" id="btn-doa-rohis" class="px-3 py-1 rounded-lg bg-zinc-800 text-zinc-300 text-xs font-semibold">Doa Sekolah</button>
-        </div>
+    <!-- 4. Doa Harian & Pelajar (Hanya Acak dari Database Admin) -->
+    <section class="p-5 rounded-2xl bg-[#141414] border border-zinc-800 space-y-3">
+      <div class="flex justify-between items-center">
+        <h2 class="text-xs uppercase tracking-widest text-zinc-400 font-semibold">Doa Pelajar & Harian</h2>
+        <button onclick="acakDoaAdmin()" class="text-xs text-[#D4AF37] hover:underline">Acak Doa ↻</button>
       </div>
-
-      <!-- Konten Doa Acak MyQuran -->
-      <div id="panel-doa-acak" class="space-y-3">
-        <div id="doa-acak-box" class="p-4 rounded-xl bg-[#1B1B1B] border border-zinc-800/80">
-          <p class="text-xs text-zinc-500 animate-pulse">Memuat doa harian...</p>
-        </div>
-        <div class="text-right">
-          <button onclick="loadDoaAcak()" class="text-xs text-[#D4AF37] hover:underline">Tampilkan Doa Lainnya ↻</button>
-        </div>
-      </div>
-
-      <!-- Konten Doa Rohis (Database) -->
-      <div id="panel-doa-rohis" class="hidden space-y-3 max-h-80 overflow-y-auto">
-        <div id="doa-rohis-box" class="space-y-3">
-          <p class="text-xs text-zinc-500">Memuat doa sekolah...</p>
-        </div>
+      <div id="doa-admin-box" class="p-4 rounded-xl bg-[#1B1B1B] border border-zinc-800/80">
+        <p class="text-xs text-zinc-500 animate-pulse">Memuat doa dari Rohis...</p>
       </div>
     </section>
 
     <!-- 5. Al-Qur'an Per Tema (MyQuran API) -->
     <section class="p-5 rounded-2xl bg-[#141414] border border-zinc-800 space-y-4">
-      <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-        <h2 class="text-xs uppercase tracking-widest text-zinc-400 font-semibold">Al-Qur'an Per Tema</h2>
-        <select id="tema-select" onchange="loadQuranTema(this.value)" class="p-2 rounded-lg bg-[#1C1C1C] border border-zinc-700 text-xs text-zinc-200 focus:outline-none focus:border-[#D4AF37]">
+      <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+        <h2 class="text-xs uppercase tracking-widest text-zinc-400 font-semibold shrink-0">Al-Qur'an Per Tema</h2>
+        <select id="tema-select" onchange="loadQuranTema(this.value)" class="w-full sm:max-w-xs truncate p-2 rounded-lg bg-[#1C1C1C] border border-zinc-700 text-xs text-zinc-200 focus:outline-none focus:border-[#D4AF37]">
           <option value="1">Memuat daftar tema...</option>
         </select>
       </div>
@@ -135,6 +156,10 @@
     </section>
 
   </main>
+
+  <!-- Root Bottom Navigation Mobile -->
+  <div id="bottom-nav-root"></div>
+  <script src="nav.js"></script>
 
   <script>
     const API_URL = "https://sholat-sman2karanganyar.yhanedy.workers.dev";
@@ -306,19 +331,47 @@
     }
 
     // ==========================================
-    // 4. DOA SEKOLAH (TURSO WORKER)
+    // 4. DOA ACAK HANYA DARI DATABASE ADMIN
     // ==========================================
+    let daftarDoaAdmin = [];
+    let indexDoaSekarang = -1;
+
+    function tampilkanDoaAdmin(idx) {
+      const box = document.getElementById('doa-admin-box');
+      if (daftarDoaAdmin.length === 0) {
+        box.innerHTML = '<p class="text-xs text-zinc-500">Belum ada doa yang ditambahkan oleh Admin Rohis.</p>';
+        return;
+      }
+      const d = daftarDoaAdmin[idx];
+      box.innerHTML = `
+        <p class="text-xs font-bold text-[#D4AF37] mb-1">${d.judul}</p>
+        <p class="text-right text-xl font-serif text-zinc-100 my-3 leading-loose">${d.arab}</p>
+        <p class="text-xs text-zinc-300 leading-relaxed">${d.arti}</p>
+      `;
+    }
+
+    function acakDoaAdmin() {
+      if (daftarDoaAdmin.length === 0) return;
+      if (daftarDoaAdmin.length === 1) {
+        tampilkanDoaAdmin(0);
+        return;
+      }
+      let nextIdx;
+      do {
+        nextIdx = Math.floor(Math.random() * daftarDoaAdmin.length);
+      } while (nextIdx === indexDoaSekarang);
+      indexDoaSekarang = nextIdx;
+      tampilkanDoaAdmin(indexDoaSekarang);
+    }
+
     fetch(API_URL)
       .then(res => res.json())
       .then(data => {
-        const doaBox = document.getElementById('doa-rohis-box');
-        doaBox.innerHTML = (data.doa || []).map(d => `
-          <div class="p-3.5 rounded-xl bg-[#1B1B1B] border border-zinc-800/60">
-            <p class="text-xs font-semibold text-[#D4AF37] mb-1">${d.judul}</p>
-            <p class="text-right text-lg font-serif my-2 leading-relaxed">${d.arab}</p>
-            <p class="text-xs text-zinc-400">${d.arti}</p>
-          </div>
-        `).join('') || '<p class="text-xs text-zinc-500">Belum ada data doa sekolah.</p>';
+        daftarDoaAdmin = data.doa || [];
+        acakDoaAdmin();
+      })
+      .catch(() => {
+        document.getElementById('doa-admin-box').innerHTML = '<p class="text-xs text-zinc-500">Gagal memuat doa dari database.</p>';
       });
 
     // ==========================================
@@ -343,67 +396,7 @@
     loadAsmaulHusna();
 
     // ==========================================
-    // 6. DOA HARIAN ACAK (MYQURAN API - DIPERBAIKI)
-    // ==========================================
-    function switchDoaTab(tab) {
-      const isAcak = tab === "acak";
-      document.getElementById("panel-doa-acak").classList.toggle("hidden", !isAcak);
-      document.getElementById("panel-doa-rohis").classList.toggle("hidden", isAcak);
-      document.getElementById("btn-doa-acak").className = isAcak
-        ? "px-3 py-1 rounded-lg bg-[#D4AF37] text-black text-xs font-bold"
-        : "px-3 py-1 rounded-lg bg-zinc-800 text-zinc-300 text-xs font-semibold";
-      document.getElementById("btn-doa-rohis").className = !isAcak
-        ? "px-3 py-1 rounded-lg bg-[#D4AF37] text-black text-xs font-bold"
-        : "px-3 py-1 rounded-lg bg-zinc-800 text-zinc-300 text-xs font-semibold";
-    }
-
-    function renderDoaItem(d) {
-      const judul = d.judul || d.title || "Doa Harian";
-      const arab = d.arab || d.arabic || "";
-      const indo = d.indo || d.arti || d.terjemah || "";
-      const sumber = d.source || d.sumber || "Doa Harian";
-
-      document.getElementById("doa-acak-box").innerHTML = `
-        <div class="flex justify-between items-center gap-2 mb-2">
-          <p class="text-xs font-bold text-[#D4AF37]">${judul}</p>
-          <span class="text-[10px] text-zinc-500 uppercase shrink-0">${sumber}</span>
-        </div>
-        <p class="text-right text-xl font-serif text-zinc-100 my-3 leading-loose">${arab}</p>
-        <p class="text-xs text-zinc-300 leading-relaxed">${indo}</p>
-      `;
-    }
-
-    async function loadDoaAcak() {
-      const box = document.getElementById("doa-acak-box");
-      box.innerHTML = `<p class="text-xs text-zinc-500 animate-pulse">Memuat doa...</p>`;
-      try {
-        const res = await fetch(`${MYQURAN_API}/doa/acak`);
-        const json = await res.json();
-        const d = Array.isArray(json.data) ? json.data[0] : json.data;
-        if (d && (d.arab || d.indo)) {
-          renderDoaItem(d);
-          return;
-        }
-        throw new Error("Data kosong");
-      } catch (e) {
-        // Fallback: ambil nomor acak 1-35 dari endpoint doa
-        try {
-          const randomId = Math.floor(Math.random() * 35) + 1;
-          const res2 = await fetch(`${MYQURAN_API}/doa/${randomId}`);
-          const json2 = await res2.json();
-          const d2 = Array.isArray(json2.data) ? json2.data[0] : json2.data;
-          if (d2) {
-            renderDoaItem(d2);
-            return;
-          }
-        } catch (err2) {}
-        box.innerHTML = `<p class="text-xs text-red-400">Gagal memuat doa harian. Silakan klik muat ulang.</p>`;
-      }
-    }
-    loadDoaAcak();
-
-    // ==========================================
-    // 7. AL-QUR'AN PER TEMA (MYQURAN API)
+    // 6. AL-QUR'AN PER TEMA (MYQURAN API - DIPERBAIKI)
     // ==========================================
     async function initDaftarTema() {
       const select = document.getElementById("tema-select");
@@ -413,6 +406,7 @@
         const listTema = json.data || [];
         if (listTema.length > 0) {
           select.innerHTML = listTema.map(t => `<option value="${t.id}">${t.name}</option>`).join("");
+          // Pilih tema kedua atau pertama yang memiliki ayat
           loadQuranTema(listTema[0].id);
         }
       } catch (e) {
@@ -427,20 +421,29 @@
       try {
         const res = await fetch(`${MYQURAN_API}/quran/tema/${id}`);
         const json = await res.json();
-        const ayatList = json.data?.ayat || json.data || [];
         
-        if (!Array.isArray(ayatList) || ayatList.length === 0) {
-          box.innerHTML = `<p class="text-xs text-zinc-500">Ayat untuk tema ini belum tersedia.</p>`;
+        // Menangani berbagai variasi struktur JSON dari endpoint tema MyQuran
+        let ayatList = [];
+        if (Array.isArray(json.data)) {
+          ayatList = json.data;
+        } else if (json.data && Array.isArray(json.data.ayat)) {
+          ayatList = json.data.ayat;
+        } else if (json.data && typeof json.data === 'object') {
+          ayatList = Object.values(json.data).filter(item => item && typeof item === 'object' && (item.arab || item.text));
+        }
+
+        if (ayatList.length === 0) {
+          box.innerHTML = `<p class="text-xs text-zinc-500">Ayat untuk tema ini belum tersedia. Silakan pilih tema lain di menu atas.</p>`;
           return;
         }
 
-        box.innerHTML = ayatList.slice(0, 5).map(a => `
+        box.innerHTML = ayatList.slice(0, 6).map(a => `
           <div class="p-4 rounded-xl bg-[#1B1B1B] border border-zinc-800/80 space-y-2">
             <div class="flex justify-between items-center">
-              <span class="text-[11px] font-semibold text-[#D4AF37]">QS. ${a.surah || ''} : ${a.ayah || a.ayat || ''}</span>
+              <span class="text-[11px] font-semibold text-[#D4AF37]">QS. ${a.surah_name || a.surah || ''} : ${a.ayah || a.ayat || ''}</span>
             </div>
-            <p class="text-right text-lg font-serif text-zinc-100 leading-loose">${a.arab || ''}</p>
-            <p class="text-xs text-zinc-400 leading-relaxed">${a.text || a.indo || ''}</p>
+            <p class="text-right text-lg font-serif text-zinc-100 leading-loose">${a.arab || a.ar || ''}</p>
+            <p class="text-xs text-zinc-400 leading-relaxed">${a.text || a.indo || a.id || ''}</p>
           </div>
         `).join("");
       } catch (e) {
@@ -450,7 +453,7 @@
     initDaftarTema();
 
     // ==========================================
-    // 8. BERITA ISLAMI (VIA WORKER PROXY)
+    // 7. BERITA ISLAMI (VIA WORKER PROXY)
     // ==========================================
     async function loadBeritaIslam() {
       const box = document.getElementById("berita-container");
