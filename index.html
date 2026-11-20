@@ -3,194 +3,202 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Rohis SMAN 2 Karanganyar - NoorStudent</title>
+  <title>NoorStudent SMAN 2 Karanganyar - Jadwal Sholat & Teman Belajar</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <style>body { background-color: #0B0B0B; color: #F4F4F5; font-family: sans-serif; }</style>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0B0B0B; color: #F4F4F5; }
+  </style>
 </head>
-<body class="min-h-screen p-4 sm:p-8">
+<body class="min-h-screen pb-12 selection:bg-[#D4AF37] selection:text-black">
 
-  <!-- Form Login -->
-  <div id="login-box" class="max-w-sm mx-auto mt-20 p-6 rounded-2xl bg-[#141414] border border-zinc-800">
-    <h1 class="text-lg font-bold text-[#D4AF37] mb-1">Admin Panel Rohis</h1>
-    <p class="text-xs text-zinc-400 mb-4">SMAN 2 Karanganyar • Masukkan password pengelola.</p>
-    <input type="password" id="admin-pass" placeholder="Password Admin..." class="w-full p-3 rounded-xl bg-[#1C1C1C] border border-zinc-700 text-sm mb-3 focus:outline-none focus:border-[#D4AF37]" />
-    <button onclick="loginAdmin()" class="w-full py-2.5 rounded-xl bg-[#D4AF37] text-black font-semibold text-sm hover:bg-[#c29f2f]">Masuk</button>
-    <p id="login-err" class="text-xs text-red-400 mt-2 hidden">Password salah atau gagal terhubung.</p>
-  </div>
-
-  <!-- Dashboard Admin -->
-  <div id="dashboard-box" class="max-w-4xl mx-auto hidden space-y-6">
-    <div class="flex justify-between items-center border-b border-zinc-800 pb-4">
+  <!-- Header -->
+  <header class="border-b border-zinc-800 bg-[#111111]/90 backdrop-blur-md sticky top-0 z-10">
+    <div class="max-w-3xl mx-auto px-4 py-4 flex justify-between items-center">
       <div>
-        <h1 class="text-xl font-bold text-[#D4AF37]">Dashboard Konten Rohis</h1>
-        <p class="text-xs text-zinc-400">SMAN 2 Karanganyar • Kelola Kajian, Doa, dan Hadits</p>
+        <h1 class="text-lg font-bold tracking-wide text-[#D4AF37]">NOOR<span class="text-white font-light">STUDENT</span></h1>
+        <p id="lokasi-text" class="text-xs text-zinc-400">SMAN 2 Karanganyar • Mendeteksi lokasi...</p>
       </div>
-      <div class="flex gap-2">
-        <a href="/" class="px-3 py-1.5 rounded-lg bg-zinc-800 text-xs hover:bg-zinc-700">Lihat Web ↗</a>
-        <button onclick="logoutAdmin()" class="px-3 py-1.5 rounded-lg bg-red-900/40 text-red-300 text-xs">Keluar</button>
+      <a href="/admin.html" class="text-xs px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-[#D4AF37] transition">Admin Rohis</a>
+    </div>
+  </header>
+
+  <main class="max-w-3xl mx-auto px-4 mt-6 space-y-6">
+    <!-- Jadwal Sholat -->
+    <section class="p-6 rounded-2xl bg-gradient-to-br from-[#161616] to-[#0F0F0F] border border-zinc-800 shadow-xl">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xs uppercase tracking-widest text-zinc-400 font-semibold">Jadwal Sholat Hari Ini</h2>
+        <span class="text-xs text-[#D4AF37]">Metode Kemenag RI</span>
       </div>
+      <div id="jadwal-container" class="grid grid-cols-5 gap-2 text-center">
+        <p class="col-span-5 text-sm text-zinc-500 animate-pulse">Memuat jadwal sholat...</p>
+      </div>
+    </section>
+
+    <!-- Kata Motivasi / Hadits Pelajar -->
+    <section class="p-5 rounded-2xl bg-[#141414] border border-[#D4AF37]/30 relative overflow-hidden">
+      <div class="flex justify-between items-center mb-2">
+        <span class="text-[11px] uppercase tracking-widest text-[#D4AF37] font-semibold">Daily Hadits & Motivasi</span>
+        <button onclick="nextMotivasi()" class="text-xs text-zinc-400 hover:text-white">Ganti Kutipan ↻</button>
+      </div>
+      <p id="motivasi-teks" class="text-sm text-zinc-200 italic leading-relaxed">"Memuat kutipan..."</p>
+      <p id="motivasi-sumber" class="text-xs text-[#D4AF37] mt-2 font-semibold"></p>
+    </section>
+
+    <!-- Pomodoro & Doa -->
+    <div class="grid md:grid-cols-2 gap-6">
+      <!-- Pomodoro -->
+      <section class="p-6 rounded-2xl bg-[#141414] border border-zinc-800 flex flex-col justify-between">
+        <div>
+          <h2 class="text-xs uppercase tracking-widest text-zinc-400 font-semibold mb-1">Fokus Belajar (Pomodoro)</h2>
+          <p class="text-xs text-zinc-500">25 menit belajar, berhenti saat adzan.</p>
+        </div>
+        <div class="text-center my-6">
+          <div id="timer-display" class="text-5xl font-mono font-bold text-white">25:00</div>
+        </div>
+        <div class="flex gap-3">
+          <button id="btn-start" onclick="toggleTimer()" class="flex-1 py-2.5 rounded-xl bg-[#D4AF37] text-black font-semibold text-sm hover:bg-[#c29f2f] transition">Mulai Fokus</button>
+          <button onclick="resetTimer()" class="px-4 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 text-sm hover:bg-zinc-700 transition">Reset</button>
+        </div>
+      </section>
+
+      <!-- Doa Pelajar (Dari Database) -->
+      <section class="p-6 rounded-2xl bg-[#141414] border border-zinc-800 space-y-3 max-h-96 overflow-y-auto">
+        <h2 class="text-xs uppercase tracking-widest text-zinc-400 font-semibold">Doa Pelajar & Ujian</h2>
+        <div id="doa-container" class="space-y-3">
+          <p class="text-xs text-zinc-500">Memuat doa...</p>
+        </div>
+      </section>
     </div>
 
-    <!-- Tab Navigasi -->
-    <div class="flex flex-wrap gap-2 border-b border-zinc-800 pb-3">
-      <button onclick="switchTab('kajian')" id="tab-kajian" class="px-4 py-2 rounded-lg bg-[#D4AF37] text-black text-xs font-bold">Info Kajian</button>
-      <button onclick="switchTab('doa')" id="tab-doa" class="px-4 py-2 rounded-lg bg-zinc-900 text-zinc-300 text-xs font-semibold">Doa Pelajar</button>
-      <button onclick="switchTab('motivasi')" id="tab-motivasi" class="px-4 py-2 rounded-lg bg-zinc-900 text-zinc-300 text-xs font-semibold">Motivasi / Hadits</button>
-      <button onclick="switchTab('password')" id="tab-password" class="px-4 py-2 rounded-lg bg-zinc-900 text-zinc-300 text-xs font-semibold">Ganti Password</button>
-    </div>
-
-    <!-- Section Kajian -->
-    <div id="sec-kajian" class="grid md:grid-cols-2 gap-6">
-      <form onsubmit="submitData(event, 'kajian')" class="p-5 rounded-2xl bg-[#141414] border border-zinc-800 space-y-3 h-fit">
-        <h2 class="text-sm font-bold text-[#D4AF37]">+ Tambah Info Kajian</h2>
-        <input name="judul" required placeholder="Judul Kajian" class="w-full p-2.5 rounded-lg bg-[#1C1C1C] border border-zinc-700 text-xs" />
-        <input name="pemateri" required placeholder="Nama Pemateri / Ustadz" class="w-full p-2.5 rounded-lg bg-[#1C1C1C] border border-zinc-700 text-xs" />
-        <input name="waktu" required placeholder="Waktu (cth: Jumat, 15.30 WIB)" class="w-full p-2.5 rounded-lg bg-[#1C1C1C] border border-zinc-700 text-xs" />
-        <input name="lokasi" required placeholder="Lokasi (cth: Masjid Sekolah)" class="w-full p-2.5 rounded-lg bg-[#1C1C1C] border border-zinc-700 text-xs" />
-        <input name="ig_url" placeholder="Link Postingan Instagram (Opsional)" class="w-full p-2.5 rounded-lg bg-[#1C1C1C] border border-zinc-700 text-xs" />
-        <button type="submit" class="w-full py-2.5 rounded-lg bg-[#D4AF37] text-black font-bold text-xs">Simpan Kajian</button>
-      </form>
-      <div id="list-kajian" class="space-y-2"></div>
-    </div>
-
-    <!-- Section Doa -->
-    <div id="sec-doa" class="grid md:grid-cols-2 gap-6 hidden">
-      <form onsubmit="submitData(event, 'doa')" class="p-5 rounded-2xl bg-[#141414] border border-zinc-800 space-y-3 h-fit">
-        <h2 class="text-sm font-bold text-[#D4AF37]">+ Tambah Doa Pelajar</h2>
-        <input name="judul" required placeholder="Judul Doa (cth: Doa Sebelum Ujian)" class="w-full p-2.5 rounded-lg bg-[#1C1C1C] border border-zinc-700 text-xs" />
-        <textarea name="arab" required rows="2" placeholder="Teks Arab..." class="w-full p-2.5 rounded-lg bg-[#1C1C1C] border border-zinc-700 text-sm text-right"></textarea>
-        <textarea name="arti" required rows="3" placeholder="Arti / Terjemahan..." class="w-full p-2.5 rounded-lg bg-[#1C1C1C] border border-zinc-700 text-xs"></textarea>
-        <button type="submit" class="w-full py-2.5 rounded-lg bg-[#D4AF37] text-black font-bold text-xs">Simpan Doa</button>
-      </form>
-      <div id="list-doa" class="space-y-2"></div>
-    </div>
-
-    <!-- Section Motivasi -->
-    <div id="sec-motivasi" class="grid md:grid-cols-2 gap-6 hidden">
-      <form onsubmit="submitData(event, 'motivasi')" class="p-5 rounded-2xl bg-[#141414] border border-zinc-800 space-y-3 h-fit">
-        <h2 class="text-sm font-bold text-[#D4AF37]">+ Tambah Hadits / Motivasi</h2>
-        <textarea name="teks" required rows="3" placeholder="Isi kutipan hadits atau motivasi..." class="w-full p-2.5 rounded-lg bg-[#1C1C1C] border border-zinc-700 text-xs"></textarea>
-        <input name="sumber" required placeholder="Sumber (cth: HR. Bukhari / Pengingat Rohis)" class="w-full p-2.5 rounded-lg bg-[#1C1C1C] border border-zinc-700 text-xs" />
-        <button type="submit" class="w-full py-2.5 rounded-lg bg-[#D4AF37] text-black font-bold text-xs">Simpan Motivasi</button>
-      </form>
-      <div id="list-motivasi" class="space-y-2"></div>
-    </div>
-
-    <!-- Section Ganti Password -->
-    <div id="sec-password" class="max-w-md hidden">
-      <form onsubmit="updatePassword(event)" class="p-5 rounded-2xl bg-[#141414] border border-zinc-800 space-y-3">
-        <h2 class="text-sm font-bold text-[#D4AF37]">Ubah Password Admin</h2>
-        <p class="text-xs text-zinc-400">Password baru akan langsung tersimpan di database Turso.</p>
-        <input type="password" id="new-pass" required minlength="4" placeholder="Masukkan password baru..." class="w-full p-2.5 rounded-lg bg-[#1C1C1C] border border-zinc-700 text-xs" />
-        <button type="submit" class="w-full py-2.5 rounded-lg bg-[#D4AF37] text-black font-bold text-xs">Simpan Password Baru</button>
-      </form>
-    </div>
-  </div>
+    <!-- Info Kajian (Dari Database) -->
+    <section class="p-6 rounded-2xl bg-[#141414] border border-zinc-800">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xs uppercase tracking-widest text-zinc-400 font-semibold">Info Kajian & Rohis</h2>
+        <span class="text-xs text-zinc-500">SMAN 2 Karanganyar</span>
+      </div>
+      <div id="kajian-container" class="space-y-3">
+        <p class="text-xs text-zinc-500">Memuat info kajian...</p>
+      </div>
+    </section>
+  </main>
 
   <script>
     const API_URL = "https://sholat-sman2karanganyar.yhanedy.workers.dev";
-    let savedPass = sessionStorage.getItem("adminPass") || "";
-    if (savedPass) showDashboard();
 
-    async function loginAdmin() {
-      const pass = document.getElementById("admin-pass").value;
-      const res = await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password: pass, action: "test" })
-      });
-      if (res.ok) {
-        savedPass = pass;
-        sessionStorage.setItem("adminPass", pass);
-        showDashboard();
-      } else {
-        document.getElementById("login-err").classList.remove("hidden");
-      }
+    // 1. Jadwal Sholat (Default fallback ke Karanganyar jika GPS ditolak)
+    function renderJadwal(timings) {
+      const list = [
+        { name: 'Subuh', time: timings.Fajr },
+        { name: 'Dzuhur', time: timings.Dhuhr },
+        { name: 'Ashar', time: timings.Asr },
+        { name: 'Maghrib', time: timings.Maghrib },
+        { name: 'Isya', time: timings.Isha }
+      ];
+      document.getElementById('jadwal-container').innerHTML = list.map(i => `
+        <div class="p-3 rounded-xl bg-[#1C1C1C] border border-zinc-800">
+          <p class="text-xs text-zinc-400 mb-1">${i.name}</p>
+          <p class="text-base sm:text-lg font-bold text-[#D4AF37]">${i.time}</p>
+        </div>
+      `).join('');
     }
 
-    function logoutAdmin() {
-      sessionStorage.removeItem("adminPass");
-      location.reload();
-    }
-
-    function showDashboard() {
-      document.getElementById("login-box").classList.add("hidden");
-      document.getElementById("dashboard-box").classList.remove("hidden");
-      loadAllData();
-    }
-
-    function switchTab(tab) {
-      ["kajian", "doa", "motivasi", "password"].forEach(t => {
-        document.getElementById("sec-" + t).classList.toggle("hidden", t !== tab);
-        const btn = document.getElementById("tab-" + t);
-        btn.className = t === tab 
-          ? "px-4 py-2 rounded-lg bg-[#D4AF37] text-black text-xs font-bold"
-          : "px-4 py-2 rounded-lg bg-zinc-900 text-zinc-300 text-xs font-semibold";
-      });
-    }
-
-    async function loadAllData() {
-      const res = await fetch(API_URL);
+    async function loadDefaultKaranganyar() {
+      document.getElementById('lokasi-text').innerText = "Karanganyar, Jawa Tengah";
+      const res = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=Karanganyar&country=Indonesia&method=20`);
       const data = await res.json();
-
-      document.getElementById("list-kajian").innerHTML = (data.kajian || []).map(k => `
-        <div class="p-3.5 rounded-xl bg-[#141414] border border-zinc-800 flex justify-between items-start gap-2">
-          <div><p class="text-xs font-bold">${k.judul}</p><p class="text-[11px] text-zinc-400">${k.pemateri} • ${k.waktu}</p></div>
-          <button onclick="deleteItem('kajian', ${k.id})" class="text-xs text-red-400 hover:underline">Hapus</button>
-        </div>`).join("");
-
-      document.getElementById("list-doa").innerHTML = (data.doa || []).map(d => `
-        <div class="p-3.5 rounded-xl bg-[#141414] border border-zinc-800 flex justify-between items-start gap-2">
-          <div><p class="text-xs font-bold text-[#D4AF37]">${d.judul}</p><p class="text-[11px] text-zinc-400 mt-1">${d.arti}</p></div>
-          <button onclick="deleteItem('doa', ${d.id})" class="text-xs text-red-400 hover:underline">Hapus</button>
-        </div>`).join("");
-
-      document.getElementById("list-motivasi").innerHTML = (data.motivasi || []).map(m => `
-        <div class="p-3.5 rounded-xl bg-[#141414] border border-zinc-800 flex justify-between items-start gap-2">
-          <div><p class="text-xs">"${m.teks}"</p><p class="text-[11px] text-[#D4AF37] mt-1">— ${m.sumber}</p></div>
-          <button onclick="deleteItem('motivasi', ${m.id})" class="text-xs text-red-400 hover:underline">Hapus</button>
-        </div>`).join("");
+      renderJadwal(data.data.timings);
     }
 
-    async function submitData(e, table) {
-      e.preventDefault();
-      const formData = new FormData(e.target);
-      const payload = Object.fromEntries(formData.entries());
-      await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password: savedPass, action: "add", table, payload })
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(async (pos) => {
+        const { latitude, longitude } = pos.coords;
+        const res = await fetch(`https://api.aladhan.com/v1/timings?latitude=${latitude}&longitude=${longitude}&method=20`);
+        const data = await res.json();
+        document.getElementById('lokasi-text').innerText = `GPS Aktif • ${data.data.meta.timezone}`;
+        renderJadwal(data.data.timings);
+      }, () => {
+        loadDefaultKaranganyar();
       });
-      e.target.reset();
-      loadAllData();
+    } else {
+      loadDefaultKaranganyar();
     }
 
-    async function deleteItem(table, id) {
-      if (!confirm("Yakin ingin menghapus item ini?")) return;
-      await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password: savedPass, action: "delete", table, id })
-      });
-      loadAllData();
+    // 2. Muat Semua Konten (Kajian, Doa, Motivasi) dari Cloudflare Worker
+    let motivasiList = [], motivasiIdx = 0;
+
+    function showMotivasi() {
+      if (motivasiList.length === 0) return;
+      const item = motivasiList[motivasiIdx];
+      document.getElementById('motivasi-teks').innerText = `"${item.teks}"`;
+      document.getElementById('motivasi-sumber').innerText = `— ${item.sumber}`;
     }
 
-    async function updatePassword(e) {
-      e.preventDefault();
-      const newPassword = document.getElementById("new-pass").value;
-      const res = await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password: savedPass, action: "change_password", payload: { newPassword } })
+    function nextMotivasi() {
+      if (motivasiList.length === 0) return;
+      motivasiIdx = (motivasiIdx + 1) % motivasiList.length;
+      showMotivasi();
+    }
+
+    fetch(API_URL)
+      .then(res => res.json())
+      .then(data => {
+        // Render Motivasi
+        motivasiList = data.motivasi || [];
+        if (motivasiList.length > 0) {
+          showMotivasi();
+        } else {
+          document.getElementById('motivasi-teks').innerText = '"Belum ada kutipan motivasi."';
+        }
+
+        // Render Doa
+        const doaBox = document.getElementById('doa-container');
+        doaBox.innerHTML = (data.doa || []).map(d => `
+          <div class="p-3.5 rounded-xl bg-[#1B1B1B] border border-zinc-800/60">
+            <p class="text-xs font-semibold text-[#D4AF37] mb-1">${d.judul}</p>
+            <p class="text-right text-lg font-serif my-2 leading-relaxed">${d.arab}</p>
+            <p class="text-xs text-zinc-400">${d.arti}</p>
+          </div>
+        `).join('') || '<p class="text-xs text-zinc-500">Belum ada data doa.</p>';
+
+        // Render Kajian
+        const kajianBox = document.getElementById('kajian-container');
+        kajianBox.innerHTML = (data.kajian || []).map(k => `
+          <div class="p-4 rounded-xl bg-[#1B1B1B] border border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h3 class="font-semibold text-zinc-100">${k.judul}</h3>
+              <p class="text-xs text-zinc-400 mt-1">${k.pemateri} • ${k.waktu} • ${k.lokasi}</p>
+            </div>
+            ${k.ig_url ? `<a href="${k.ig_url}" target="_blank" rel="noopener noreferrer" class="px-4 py-2 rounded-lg bg-zinc-900 border border-[#D4AF37]/40 text-[#D4AF37] text-xs font-medium hover:bg-[#D4AF37] hover:text-black transition text-center">Lihat Poster IG ↗</a>` : ''}
+          </div>
+        `).join('') || '<p class="text-xs text-zinc-500">Belum ada jadwal kajian terdekat.</p>';
+      })
+      .catch(err => {
+        console.error("Gagal memuat data dari Worker:", err);
       });
-      if (res.ok) {
-        savedPass = newPassword;
-        sessionStorage.setItem("adminPass", newPassword);
-        document.getElementById("new-pass").value = "";
-        alert("Password berhasil diperbarui di database!");
-      } else {
-        alert("Gagal memperbarui password.");
+
+    // 3. Timer Pomodoro
+    let seconds = 1500, interval = null;
+    function updateDisplay() {
+      const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+      const s = String(seconds % 60).padStart(2, '0');
+      document.getElementById('timer-display').innerText = `${m}:${s}`;
+    }
+    function toggleTimer() {
+      const btn = document.getElementById('btn-start');
+      if (interval) { clearInterval(interval); interval = null; btn.innerText = "Lanjut Fokus"; }
+      else {
+        btn.innerText = "Jeda";
+        interval = setInterval(() => {
+          if (seconds > 0) { seconds--; updateDisplay(); }
+          else { clearInterval(interval); alert("Waktu belajar selesai! Cek jadwal sholat."); }
+        }, 1000);
       }
+    }
+    function resetTimer() {
+      clearInterval(interval); interval = null; seconds = 1500;
+      document.getElementById('btn-start').innerText = "Mulai Fokus";
+      updateDisplay();
     }
   </script>
 </body>
